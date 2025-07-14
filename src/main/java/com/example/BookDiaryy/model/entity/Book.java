@@ -1,6 +1,7 @@
 package com.example.BookDiaryy.model.entity;
 
 import com.example.BookDiaryy.model.enums.Status;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.ManyToOne;
@@ -17,6 +18,7 @@ public class Book extends BaseEntity implements Serializable {
     @Enumerated
     private Status status;
     @ManyToOne
+    @JsonBackReference
     private User user;
 
     public Book(String author, String description, String name, int pages, String photoUrl, Status status, User user) {
@@ -27,6 +29,10 @@ public class Book extends BaseEntity implements Serializable {
         this.photoUrl = photoUrl;
         this.status = status;
         this.user = user;
+    }
+
+    public Book(){
+
     }
 
     public String getAuthor() {

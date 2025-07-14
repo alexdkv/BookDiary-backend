@@ -30,8 +30,15 @@ public class BookService {
         return bookRepository.findAll();
     }
 
-    public Book updateBook(Book book){
-        return bookRepository.save(book);
+    public Book updateBook(Long id, Book book){
+        Book bookToUpdate = bookRepository.findById(id).orElseThrow(()->new NoSuchElementException("Book not Found"));
+        bookToUpdate.setName(book.getName());
+        bookToUpdate.setAuthor(book.getAuthor());
+        bookToUpdate.setDescription(book.getDescription());
+        bookToUpdate.setPages(book.getPages());
+        bookToUpdate.setPhotoUrl(book.getPhotoUrl());
+        bookToUpdate.setStatus(bookToUpdate.getStatus());
+        return bookRepository.save(bookToUpdate);
     }
 
     public Book getBookById(Long id){

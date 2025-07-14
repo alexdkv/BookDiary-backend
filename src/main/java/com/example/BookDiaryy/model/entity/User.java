@@ -1,10 +1,12 @@
 package com.example.BookDiaryy.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -14,13 +16,18 @@ public class User extends BaseEntity implements Serializable {
     private String password;
     private String email;
     @OneToMany(mappedBy = "user",fetch = FetchType.EAGER)
+    @JsonManagedReference
     private List<Book> books;
 
-    public User(List<Book> books, String email, String password, String username) {
-        this.books = books;
+    public User(String email, String password, String username, List<Book> books) {
         this.email = email;
         this.password = password;
         this.username = username;
+        this.books = books;
+    }
+
+    public User() {
+        this.books = new ArrayList<>();
     }
 
     public List<Book> getBooks() {

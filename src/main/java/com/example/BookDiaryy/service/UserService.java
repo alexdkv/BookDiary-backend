@@ -20,6 +20,9 @@ public class UserService {
         this.bookRepository = bookRepository;
     }
 
+    public User addUser(User user){
+        return userRepository.save(user);
+    }
     public User getUserById(Long id){
         return userRepository.findById(id).orElseThrow(NoSuchElementException::new);
     }
