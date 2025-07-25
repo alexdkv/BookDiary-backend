@@ -1,11 +1,18 @@
 package com.example.BookDiaryy.service;
 
+import com.example.BookDiaryy.model.dto.UserRegistrationDTO;
 import com.example.BookDiaryy.model.entity.Book;
+import com.example.BookDiaryy.model.entity.Role;
 import com.example.BookDiaryy.model.entity.User;
+import com.example.BookDiaryy.model.enums.UserRoleENUM;
 import com.example.BookDiaryy.repository.BookRepository;
+import com.example.BookDiaryy.repository.RoleRepository;
 import com.example.BookDiaryy.repository.UserRepository;
+import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -14,10 +21,43 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
-    public UserService(UserRepository userRepository, BookRepository bookRepository) {
+    public UserService(UserRepository userRepository, BookRepository bookRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, ModelMapper modelMapper) {
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.modelMapper = modelMapper;
+    }
+
+    public boolean registerUser(UserRegistrationDTO userRegistrationDTO){
+        if (!userRegistrationDTO.getPassword().equals(userRegistrationDTO.getConfirmPassword())){
+            return false;
+        }
+        boolean existsByUsernameOrEmail = userRepository.existsByUsernameOrEmail(
+                userRegistrationDTO.getUsername(),
+                userRegistrationDTO.getEmail()
+        );
+        if (existsByUsernameOrEmail){
+            return false;
+        }
+        userRepository.save(map(userRegistrationDTO));
+        return true;
+    }
+
+    private User map(UserRegistrationDTO userRegistrationDTO){
+        User mappedEntity = modelMapper.map(userRegistrationDTO, User.class);
+        mappedEntity.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
+
+        Role role = roleRepository.findByName(UserRoleENUM.USER)
+                .orElseThrow(() -> new IllegalArgumentException("Role USER not found in DB"));
+
+        mappedEntity.setRole(Collections.singletonList(role));
+
+        return mappedEntity;
     }
 
     public User addUser(User user){

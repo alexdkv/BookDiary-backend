@@ -1,8 +1,10 @@
 package com.example.BookDiaryy.controller;
 
+import com.example.BookDiaryy.model.dto.UserRegistrationDTO;
 import com.example.BookDiaryy.model.entity.Book;
 import com.example.BookDiaryy.model.entity.User;
 import com.example.BookDiaryy.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,4 +39,16 @@ public class UserController {
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody @Valid UserRegistrationDTO registrationDTO){
+        System.out.println(registrationDTO.getUsername());
+        System.out.println(registrationDTO.getEmail());
+        System.out.println(registrationDTO.getPassword());
+        System.out.println(registrationDTO.getConfirmPassword());
+        boolean hasSuccessfulRegistration = userService.registerUser(registrationDTO);
+        if (!hasSuccessfulRegistration){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Registration failed!");
+        }
+        return ResponseEntity.ok("Registration successful");
+    }
 }

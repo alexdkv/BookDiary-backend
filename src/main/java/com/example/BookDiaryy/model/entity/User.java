@@ -3,6 +3,7 @@ package com.example.BookDiaryy.model.entity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 
 import java.io.Serializable;
@@ -18,6 +19,9 @@ public class User extends BaseEntity implements Serializable {
     @OneToMany(mappedBy = "user",fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<Book> books;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    private List<Role> role;
 
     public User(String email, String password, String username, List<Book> books) {
         this.email = email;
@@ -60,5 +64,13 @@ public class User extends BaseEntity implements Serializable {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public List<Role> getRole() {
+        return role;
+    }
+
+    public void setRole(List<Role> role) {
+        this.role = role;
     }
 }
