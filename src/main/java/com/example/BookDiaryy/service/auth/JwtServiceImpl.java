@@ -1,6 +1,7 @@
 package com.example.BookDiaryy.service.auth;
 
 import com.example.BookDiaryy.model.entity.User;
+import com.example.BookDiaryy.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -13,18 +14,32 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 @Service
 public class JwtServiceImpl implements JwtService{
 
+    private final UserRepository userRepository;
+
     String secret = "0ea38897925118e4ab1d18f5a13b6cd50094b326df9655222a9cb7dcb2c1e9ff";
 
     private final SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 
+    public JwtServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     @Override
-    public String generateToken(User user) {
-        return /*"Bearer-" +*/ generateTokenValue(new HashMap<>(), user.getUsername());
+    public String generateToken(UserDetails user) {
+        Map<String, Object> claims = new HashMap<>();
+        Optional<User> currentUser = userRepository.findByEmail(user.getUsername());
+        if (currentUser.isPresent()){
+            claims.put("id", currentUser.get().getId());
+            claims.put("role",currentUser.get().getRole());
+        }
+
+        return /*"Bearer-" +*/ generateTokenValue(claims, user.getUsername());
     }
 
     @Override

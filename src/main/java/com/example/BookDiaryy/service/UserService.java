@@ -8,7 +8,9 @@ import com.example.BookDiaryy.model.enums.UserRoleENUM;
 import com.example.BookDiaryy.repository.BookRepository;
 import com.example.BookDiaryy.repository.RoleRepository;
 import com.example.BookDiaryy.repository.UserRepository;
+import com.example.BookDiaryy.service.auth.JwtService;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +27,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
 
-    public UserService(UserRepository userRepository, BookRepository bookRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, ModelMapper modelMapper) {
+
+    public UserService(UserRepository userRepository, BookRepository bookRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, ModelMapper modelMapper, JwtService jwtService, AuthenticationManager authenticationManager) {
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
         this.roleRepository = roleRepository;

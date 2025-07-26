@@ -32,7 +32,7 @@ public class LoginDetailsService implements UserDetailsService {
         Optional<User> user = userRepository.findByUsername(username);
         UserDetails userDetails = user.map(LoginDetailsService::map)
                 .orElseThrow(() -> new UsernameNotFoundException("User with username: " + username + " does not exist."));
-        Cookie cookie = new Cookie("jwt", jwtService.generateToken(user.get()));
+        Cookie cookie = new Cookie("jwt", jwtService.generateToken(userDetails));
         cookie.setMaxAge(60*60*24*1000*10);
         cookie.setHttpOnly(true);
         response.addCookie(cookie);
