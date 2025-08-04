@@ -36,19 +36,20 @@ public class UserService {
         this.modelMapper = modelMapper;
     }
 
-    public boolean registerUser(UserRegistrationDTO userRegistrationDTO){
+    public String registerUser(UserRegistrationDTO userRegistrationDTO){
         if (!userRegistrationDTO.getPassword().equals(userRegistrationDTO.getConfirmPassword())){
-            return false;
+            return "Passwords do not match";
         }
-        boolean existsByUsernameOrEmail = userRepository.existsByUsernameOrEmail(
-                userRegistrationDTO.getUsername(),
-                userRegistrationDTO.getEmail()
-        );
-        if (existsByUsernameOrEmail){
-            return false;
+        boolean existsByUsername = userRepository.existsByUsername(userRegistrationDTO.getUsername());
+        boolean existsByEmail = userRepository.existsByEmail(userRegistrationDTO.getEmail());
+        if (existsByUsername){
+            return "User with this username already exists";
+        }
+        if (existsByEmail){
+            return "User with this email already exists";
         }
         userRepository.save(map(userRegistrationDTO));
-        return true;
+        return "success";
     }
 
     private User map(UserRegistrationDTO userRegistrationDTO){

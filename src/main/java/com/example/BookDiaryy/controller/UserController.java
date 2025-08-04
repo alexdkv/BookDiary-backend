@@ -53,9 +53,9 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid UserRegistrationDTO registrationDTO){
-        boolean hasSuccessfulRegistration = userService.registerUser(registrationDTO);
-        if (!hasSuccessfulRegistration){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Registration failed!");
+        String registrationResult = userService.registerUser(registrationDTO);
+        if (!registrationResult.equals("success")){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", registrationResult));
         }
         return ResponseEntity.ok(Map.of("message", "Registration successful"));
     }
