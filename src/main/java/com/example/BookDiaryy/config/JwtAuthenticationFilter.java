@@ -40,6 +40,71 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+        // Skip filter for login/register endpoints
+        if (path.equals("/user/login") || path.equals("/user/register")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if (path.startsWith("/user/login") ||
+                path.startsWith("/user/register") ||
+                path.startsWith("/book/")) {
+
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if ( request.getRequestURI().equals("/book/**") || request.getRequestURI().equals("/book/allBooks") ) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        String jwt = null;
+        String authHeader = request.getHeader("Authorization");
+
+        // 1. First check Authorization header
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            jwt = authHeader.substring(7);
+        }
+        // 2. Fallback to cookie if header not present
+        else if (request.getCookies() != null) {
+            Cookie jwtCookie = Arrays.stream(request.getCookies())
+                    .filter(cookie -> cookie.getName().equals("jwt"))
+                    .findFirst()
+                    .orElse(null);
+            jwt = jwtCookie != null ? jwtCookie.getValue() : null;
+        }
+
+        // If no token found, continue chain
+        if (jwt == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        try {
+            String username = jwtService.getUsernameFromToken(jwt);
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                if (jwtService.isTokenValid(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+            }
+        } catch (ExpiredJwtException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
+            // Handle token expiration/refresh logic if needed
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT");
+            return;
+        }
+
+        filterChain.doFilter(request, response);
+
+        /*
         if (request.getRequestURI().equals("/login") || request.getRequestURI().equals("/register")){
             filterChain.doFilter(request,response);
             return;
@@ -55,7 +120,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authorizationHeader = jwtCookie != null ? jwtCookie.getValue() : null;
         String jwt;
         String username;
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer-")){
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")){
             filterChain.doFilter(request, response);
             return;
         }
@@ -83,5 +148,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.clearContext();
             filterChain.doFilter(request, response);
         }
+         */
     }
 }

@@ -29,7 +29,7 @@ public class LoginDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findByUsername(username);
+        Optional<User> user = userRepository.findByEmail(username);
         UserDetails userDetails = user.map(LoginDetailsService::map)
                 .orElseThrow(() -> new UsernameNotFoundException("User with username: " + username + " does not exist."));
         Cookie cookie = new Cookie("jwt", jwtService.generateToken(userDetails));
