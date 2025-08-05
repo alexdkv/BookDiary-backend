@@ -6,6 +6,7 @@ import com.example.BookDiaryy.repository.BookRepository;
 import com.example.BookDiaryy.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -23,6 +24,7 @@ public class BookService {
         User user = userRepository.findById(userId)
                 .orElseThrow(()->new RuntimeException("User not Found"));
         book.setUser(user);
+        book.setRatings(new ArrayList<>());
         return bookRepository.save(book);
     }
 
@@ -37,7 +39,7 @@ public class BookService {
         bookToUpdate.setDescription(book.getDescription());
         bookToUpdate.setPages(book.getPages());
         bookToUpdate.setPhotoUrl(book.getPhotoUrl());
-        bookToUpdate.setStatus(bookToUpdate.getStatus());
+        bookToUpdate.setStatus(book.getStatus());
         return bookRepository.save(bookToUpdate);
     }
 

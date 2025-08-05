@@ -2,24 +2,38 @@ package com.example.BookDiaryy.model.entity;
 
 import com.example.BookDiaryy.model.enums.Status;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Book extends BaseEntity implements Serializable {
     private String name;
+
     private String author;
-    @Column(columnDefinition = "TEXTve")
+
+    @Column(columnDefinition = "TEXT")
     private String description;
+
     private int pages;
+
     private String photoUrl;
+
     @Enumerated
     private Status status;
+
     @ManyToOne(fetch = FetchType.EAGER)
+    //@JsonBackReference
     @JsonIgnoreProperties({"books"})
     private User user;
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonIgnore
+    private List<Rating> ratings;
 
     public Book(String author, String description, String name, int pages, String photoUrl, Status status, User user) {
         this.author = author;
@@ -29,10 +43,13 @@ public class Book extends BaseEntity implements Serializable {
         this.photoUrl = photoUrl;
         this.status = status;
         this.user = user;
+        this.ratings = new ArrayList<>();
     }
 
-    public Book(){
 
+
+    public Book(){
+        this.ratings  = new ArrayList<>();
     }
 
     public String getAuthor() {
@@ -89,6 +106,14 @@ public class Book extends BaseEntity implements Serializable {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<Rating> getRatings() {
+        return ratings;
+    }
+
+    public void setRatings(List<Rating> ratings) {
+        this.ratings = ratings;
     }
 }
 

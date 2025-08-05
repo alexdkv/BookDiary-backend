@@ -1,5 +1,6 @@
 package com.example.BookDiaryy.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -17,7 +18,8 @@ public class User extends BaseEntity implements Serializable {
     private String password;
     private String email;
     @OneToMany(mappedBy = "user",fetch = FetchType.EAGER)
-    @JsonManagedReference
+    //@JsonManagedReference
+    //@JsonIgnore
     private List<Book> books;
 
     @ManyToMany(fetch = FetchType.EAGER)
